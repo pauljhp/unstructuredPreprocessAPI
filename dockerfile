@@ -2,7 +2,9 @@ FROM ubuntu:20.04 as base
 
 USER 0
 # install miniconda
-RUN apt-get update && apt-get install -y wget
+RUN apt-get update && \
+        apt-get install -y wget \
+        git
 RUN wget --output-document="Miniconda3-latest-Linux-x86_64.sh" https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 RUN bash Miniconda3-latest-Linux-x86_64.sh -b \
     -p /opt/miniconda3 && \
@@ -27,6 +29,7 @@ RUN pip install pikepdf \
     pydantic
 
 # Clone the repository
+SHELL ["/bin/bash", "-c"]
 RUN git clone https://github.com/pauljhp/unstructuredPreprocessAPI /app
 
 # Set the working directory
