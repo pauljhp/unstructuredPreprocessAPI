@@ -4,14 +4,16 @@ from fastapi import (
     Depends,
     FastAPI,
     File,
-    UploadFile
+    UploadFile,
+    HTTPException
 )
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import HTMLResponse
-from models import PdfProcessRequestContainer
+from models import GetUrlPdfParamsContainer
 from api import concurrent_partition_pdf
 from tempfile import NamedTemporaryFile
-import sys
+import io
+import requests
 
 
 app = FastAPI()
@@ -50,6 +52,38 @@ async def create_file(
             chunk_size=chunk_size,
             max_workers=max_workers,
             additional_metadata=additional_metadata
+        )
+        return extracted_elems
+    finally:
+        Path(tf.name).unlink()
+
+
+@app.post("/v0/pdf/extract-pdf-from-url/")
+def get_content(
+    items: GetUrlPdfParamsContainer
+):
+    tf = NamedTemporaryFile(mode="wb", delete=False)
+    try:
+        res = requests.get(items.url)
+        if res.status_code == 200:
+            data = io.BytesIO(res.content)
+            data.seek(0)
+            tf.write(data.getvalue())
+            tf.flush()
+        else:
+            raise HTTPException(
+                status_code=400, detail="Failed to fetch PDF from URL.")
+    except requests.RequestException as e:
+        raise HTTPException(status_code=400, detail=f"An error happened. {e}")
+    finally:
+        tf.close()
+
+    try:
+        extracted_elems = concurrent_partition_pdf(
+            file_name=tf.name,
+            chunk_size=items.chunk_size,
+            max_workers=items.max_workers,
+            additional_metadata=items.additional_metadata
         )
         return extracted_elems
     finally:
