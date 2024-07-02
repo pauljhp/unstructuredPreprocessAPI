@@ -88,6 +88,8 @@ def unstructured_partition_pdf(
             return elements
     except UnicodeDecodeError:
         return {}
+    except KeyError:
+        return {}
 
 
 def concurrent_partition_pdf(
