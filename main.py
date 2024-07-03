@@ -72,9 +72,14 @@ def get_content(
             tf.flush()
         else:
             raise HTTPException(
-                status_code=400, detail="Failed to fetch PDF from URL.")
+                status_code=400,
+                detail="Failed to fetch PDF from URL."
+            )
     except requests.RequestException as e:
-        raise HTTPException(status_code=400, detail=f"An error happened. {e}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"An error happened. {e}"
+        )
     finally:
         tf.close()
 
