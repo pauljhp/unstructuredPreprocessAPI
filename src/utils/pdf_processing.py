@@ -23,6 +23,7 @@ def pdf_page_has_table(page: pdfplumber.page, strict: bool = False) -> bool:
 
 
 def pdf_has_table(filepath: str, strict: bool = False) -> bool:
+    # TODO - add edge case table detection
     with pdfplumber.open(filepath) as pdf:
         for page in pdf.pages:
             has_table = pdf_page_has_table(page)

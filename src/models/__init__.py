@@ -11,8 +11,8 @@ class User:
 
 class GetUrlPdfParamsContainer(BaseModel):
     url: str
-    chunk_size: Annotated[int, "chunk size for cutting pdfs up"] = 16
-    max_workers: Annotated[int, "max workers for concurrent processing"] = 4
+    chunk_size: Annotated[int, "chunk size for cutting pdfs up"] = 8
+    max_workers: Annotated[int, "max workers for concurrent processing"] = 16
     additional_metadata: Annotated[
         Optional[Dict[Hashable, Any]],
         "Addtional metadata to be written into the results"] = {}

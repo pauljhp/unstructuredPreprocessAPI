@@ -40,14 +40,16 @@ RUN pip install pikepdf \
     uvicorn \
     pydantic \
     llama-index-readers-file \
-    llama-index-readers-smart-pdf-loader
+    llama-index-readers-smart-pdf-loader \
+    uuid \
+    deprecated
 
 # Clone the repository
 SHELL ["/bin/bash", "-c"]
 RUN git clone https://github.com/pauljhp/unstructuredPreprocessAPI /app
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /app/src
 
 # Set environment variables
 ENV SQL_DB_CONN_STR=""
