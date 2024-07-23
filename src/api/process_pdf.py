@@ -94,8 +94,8 @@ def unstructured_partition_pdf(
 
 def concurrent_partition_pdf(
     file_name: str,
-    chunk_size: int = 16,
-    max_workers: int = 4,
+    chunk_size: int = 8,
+    max_workers: int = 16,
     additional_metadata: Optional[Dict[Hashable, Any]] = None
 ) -> List[Element]:
     splitted_filenames = split_pdf_into_chunks(

@@ -28,6 +28,7 @@ SHELL ["conda", "run", "-n", "unstructured_env", "/bin/bash", "-c"]
 # Install Python packages
 RUN pip install pikepdf \
     numpy==1.26.4 \
+    nltk==3.8.1 \
     unstructured[all-docs]==0.12.4 \
     unstructured-inference==0.7.23 \
     unstructured.pytesseract==0.3.12 \
@@ -38,7 +39,8 @@ RUN pip install pikepdf \
     fastapi \
     markdownify \
     uvicorn \
-    pydantic \
+    pydantic 
+RUN pip install \
     llama-index-readers-file \
     llama-index-readers-smart-pdf-loader \
     uuid \
@@ -65,4 +67,5 @@ EXPOSE 8000
 # Set the entrypoint to run the application
 ENTRYPOINT ["conda", "run", "-n", \
     "unstructured_env", "uvicorn", \
-    "main:app", "--host=0.0.0.0", "--port=8000"]
+    "main:app", "--host=0.0.0.0", "--port=8000", \
+    "--reload"]
