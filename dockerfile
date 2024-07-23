@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 as base
+FROM ubuntu:20.04 AS base
 ARG DEBIAN_FRONTEND=noninteractive
 
 USER 0
@@ -54,12 +54,12 @@ RUN git clone https://github.com/pauljhp/unstructuredPreprocessAPI /app
 WORKDIR /app/src
 
 # Set environment variables
-ENV SQL_DB_CONN_STR=""
-ENV API_TOKEN=""
-ENV SECRET_KEY=""
-ENV HASH_ALGORITHM="HS256"
-ENV ACCESS_TOKEN_EXPIRE_MINUTES=30
-ENV LLMSHERPA_API_URL="https://readers.llmsherpa.com/api/document/developer/parseDocument?renderFormat=all"
+ENV SQL_DB_CONN_STR ""
+ENV API_TOKEN ""
+ENV SECRET_KEY ""
+ENV HASH_ALGORITHM "HS256"
+ENV ACCESS_TOKEN_EXPIRE_MINUTES 30
+ENV LLMSHERPA_API_URL "https://readers.llmsherpa.com/api/document/developer/parseDocument?renderFormat=all"
 
 # Expose port 8000 for the application
 EXPOSE 8000
