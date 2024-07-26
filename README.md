@@ -4,25 +4,32 @@ API for preprocessing unstructured documents so they are ready for ingestion int
 ## Key modules
 
 ### 1. PDF processing
-- /v1/pdf/extract-pdf/
+- [/v1/pdf/extract-pdf/]()
 Submit a task by uploading a file. 
+Parameters:
+- file: BytesIO
+- max_workers: int
+- chunk_size: int
+- addtional_metadata: Dict
 
 Usage: 
-
+In python:
 `res = requests.post(endpoint, files={"file": open(filepath, "rb")}, json=data)`
 
-- /v1/pdf/extract-pdf-from-url/
+- [/v1/pdf/extract-pdf-from-url/]()
 
 Similar to the `extract-pdf` endpoint, but instead of uploading a file, just submit the url to the pdf file. 
 
-- /v1/tasks/get-results/{task_id}
+- [/v1/tasks/get-results/{task_id}]()
 
 Used for retrieving finished tasks
 
-- /v1/tasks/status/{task_id}
+- [/v1/tasks/status/{task_id}]()
 
 Used for querying task status. 202 means task is pending. Status code 404 means task does not exist. 
 
+- [/v1/tasks/get-all-tasks/]()
+Taks no parameters. Gives a dictionary of all the current tasks and their status.
 
 Deprecated:
 

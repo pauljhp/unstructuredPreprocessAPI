@@ -165,13 +165,17 @@ async def get_status(task_id: str) -> responses.JSONResponse:
             )
 
 
-@app.get("/v1/cleanup/{task_id}")
+@app.get("/v1/stasks/cleanup/{task_id}")
 async def remove_task(task_id: str) -> Dict[str, str]:
     result_path = result_dir.joinpath(f"{task_id}.json")
     result_path.unlink()
     task_status["task_id"] = "removed"
     return {"message": f"success! {task_id} removed"}
 
+
+@app.get("/v1/tasks/get-all-tasks/")
+async def get_tasks():
+    return task_status
 
 # @deprecated(version="1.0", reason="The /v0/ endpoints have been deprecated. Use /v1/ instead")
 # @app.post("/v0/pdf/extract-pdf/")
@@ -242,3 +246,4 @@ async def remove_task(task_id: str) -> Dict[str, str]:
 #         return extracted_elems
 #     finally:
 #         Path(tf.name).unlink()
+œœ
