@@ -16,14 +16,15 @@ from tempfile import NamedTemporaryFile, TemporaryDirectory
 import io
 import requests
 import utils
-from deprecated import deprecated
+# from deprecated import deprecated
+import time
 
 
 app = FastAPI()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-task_status = {}
+tasks = {}
 result_dir = Path("../appdata/task_results")
 result_dir.mkdir(exist_ok=True, parents=True)
 
@@ -34,9 +35,10 @@ def process_pdf_file(
         chunk_size: int = 8,
         max_workers: int = 16,
         additional_metadata: Dict[str, Any] = {}):
-    task_status[task_id] = "pending"
+    tasks[task_id]["status"] = "pending"
     try:
         print("processing")
+        tasks[task_id]["status"] = "processing"
         extracted_elems = concurrent_partition_pdf(
             file_name=file_path,
             chunk_size=chunk_size,
@@ -45,7 +47,8 @@ def process_pdf_file(
         )
         result_path = result_dir.joinpath(f"{task_id}.json")
         utils.save_result(extracted_elems, result_path.as_posix())
-        task_status[task_id] = "completed"
+        tasks[task_id]["status"] = "completed"
+        tasks[task_id]["finish_time"] = time.time()
     finally:
         Path(file_path).unlink()
     print("finished")
@@ -71,7 +74,9 @@ async def create_file(background_tasks: BackgroundTasks,
     tf.write(data)
     tf.close()
 
-    task_status[task_id] = "initiated"
+    tasks[task_id] = {}
+    tasks[task_id]["status"] = "initiated"
+    tasks[task_id]["start_time"] = time.time()
     background_tasks.add_task(
         process_pdf_file,
         task_id,
@@ -110,7 +115,9 @@ async def create_file(background_tasks: BackgroundTasks,
     finally:
         tf.close()
 
-    task_status[task_id] = "initiated"
+    tasks[task_id] = {}
+    tasks[task_id]["status"] = "initiated"
+    tasks[task_id]["start_time"] = time.time()
     background_tasks.add_task(
         process_pdf_file,
         task_id,
@@ -125,23 +132,29 @@ async def create_file(background_tasks: BackgroundTasks,
 @app.get("/v1/tasks/get-results/{task_id}")
 async def get_result(task_id: str) -> responses.JSONResponse:
     result_path = result_dir.joinpath(f"{task_id}.json")
-    print(result_path.as_posix())
-    if result_path.exists():
-        result = utils.load_result(result_path)
-        return responses.JSONResponse(
-            status_code=200,
-            content=result
-        )
+    # print(result_path.as_posix())
+    if tasks.get(task_id):
+        if result_path.exists():
+            result = utils.load_result(result_path)
+            return responses.JSONResponse(
+                status_code=200,
+                content=result
+            )
+        else:
+            return responses.JSONResponse(
+                status_code=404,
+                content={"message": "Result not found!"}
+            )
     else:
         return responses.JSONResponse(
             status_code=404,
-            content={"message": "Result not found or already retrieved."}
+            content={"message": "Task does not exist!"}
         )
 
 
 @app.get("/v1/tasks/status/{task_id}")
 async def get_status(task_id: str) -> responses.JSONResponse:
-    status = task_status.get(task_id)
+    status = tasks.get(task_id).get("status")
     match status:
         case "initiated" | "pending":
             return responses.JSONResponse(
@@ -169,13 +182,13 @@ async def get_status(task_id: str) -> responses.JSONResponse:
 async def remove_task(task_id: str) -> Dict[str, str]:
     result_path = result_dir.joinpath(f"{task_id}.json")
     result_path.unlink()
-    task_status["task_id"] = "removed"
+    tasks["task_id"]["status"] = "removed"
     return {"message": f"success! {task_id} removed"}
 
 
 @app.get("/v1/tasks/get-all-tasks/")
 async def get_tasks():
-    return task_status
+    return tasks
 
 # @deprecated(version="1.0", reason="The /v0/ endpoints have been deprecated. Use /v1/ instead")
 # @app.post("/v0/pdf/extract-pdf/")
