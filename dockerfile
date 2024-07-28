@@ -23,10 +23,11 @@ RUN bash Miniconda3-latest-Linux-x86_64.sh -b \
     /opt/miniconda3/bin/conda init
 ENV PATH /opt/miniconda3/bin:$PATH
 RUN conda create -n unstructured_env python=3.11 -y
-SHELL ["conda", "run", "-n", "unstructured_env", "/bin/bash", "-c"]
+# SHELL ["conda", "run", "-n", "unstructured_env", "/bin/bash", "-c"]
 
 # Install Python packages
-RUN pip install pikepdf \
+RUN conda run -n unstructured_env python -m pip install \
+    pikepdf==9.0.0 \
     numpy==1.26.4 \
     nltk==3.8.1 \
     unstructured[all-docs]==0.12.4 \
@@ -34,13 +35,14 @@ RUN pip install pikepdf \
     unstructured.pytesseract==0.3.12 \
     onnx==1.16.0 \
     onnxruntime==1.15.1 \
-    jose \
-    passlib \
-    fastapi \
-    markdownify \
-    uvicorn \
-    pydantic 
-RUN pip install \
+    jose==1.0.0
+RUN conda run -n unstructured_env python -m pip install \
+    passlib==1.7.4 \
+    fastapi==0.111.0 \
+    markdownify==0.12.1 \
+    uvicorn==0.30.1 \
+    pydantic==2.7.4 
+RUN conda run -n unstructured_env python -m pip install \
     llama-index-readers-file \
     llama-index-readers-smart-pdf-loader \
     uuid \
@@ -60,6 +62,7 @@ ENV SECRET_KEY=""
 ENV HASH_ALGORITHM="HS256"
 ENV ACCESS_TOKEN_EXPIRE_MINUTES=30
 ENV LLMSHERPA_API_URL="https://readers.llmsherpa.com/api/document/developer/parseDocument?renderFormat=all"
+ENV PYTHONUNBUFFERED=1
 
 # Expose port 8000 for the application
 EXPOSE 8000

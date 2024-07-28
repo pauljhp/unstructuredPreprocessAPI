@@ -24,7 +24,7 @@ app = FastAPI()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 task_status = {}
-result_dir = Path("~/task_results")
+result_dir = Path("../appdata/task_results")
 result_dir.mkdir(exist_ok=True, parents=True)
 
 
