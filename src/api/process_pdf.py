@@ -43,6 +43,9 @@ def unstructured_partition_pdf(
                 if "coordinates" in element["metadata"].keys():
                     element["metadata"].pop("coordinates")
                 element["metadata"]["page_number"] += chunk_no * chunk_size
+                element["id_"] = element.pop("element_id")
+                element["metadata_template"] = "{key}: {value}"
+                element["text_template"] = "{metadata_str}\n\n{content}"
                 if elem.category == "Table":
                     element["text"] = element["metadata"].pop("text_as_html")
                     element["text"] = md(element["text"])
